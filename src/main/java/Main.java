@@ -1,5 +1,4 @@
-import models.ApiResponse;
-import network.Fetcher;
+import utils.Fetcher;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -29,14 +28,14 @@ public class Main {
                 from = from.toUpperCase().trim();
                 to = to.toUpperCase().trim();
 
-                ApiResponse data = Fetcher.fetchCurrency(from, to);
+                Double value = Fetcher.fetchCurrency(from, to);
 
-                if (data == null) {
+                if (value == null) {
                     printer.println("Sorry :( Your input is invalid\n");
                     continue;
                 }
 
-                printer.println(String.format(Locale.US, "%s -> %s : %.3f\n", from, to, data.getRates().getValue()));
+                printer.println(String.format(Locale.US, "%s -> %s : %.3f\n", from, to, value));
 
             } catch (IOException e) {
                 e.printStackTrace();

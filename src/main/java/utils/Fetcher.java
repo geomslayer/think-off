@@ -1,11 +1,10 @@
-package network;
+package utils;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.sun.istack.internal.Nullable;
 import models.ApiResponse;
 import models.Rate;
-import utils.RatesDeserializer;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -29,24 +28,35 @@ public class Fetcher {
     }
 
     @Nullable
-    public static ApiResponse fetchCurrency(String from, String to) {
+    public static Double fetchCurrency(String from, String to) {
         BufferedReader reader = null;
-        ApiResponse res = null;
+        Double res = null;
 
         if (!validate(from) || !validate(to)) {
             return null;
         }
 
+        res = Cacher.restore(from, to);
+        if (res != null) {
+            System.out.println("Restored cached value");
+            return res;
+        }
+
         try {
             URL url = new URL(String.format(baseUrl, from, to));
             reader = new BufferedReader(new InputStreamReader(url.openStream()));
-
-            String json = reader.readLine();
-            res = getGson().fromJson(json, ApiResponse.class);
+            ApiResponse response = getGson().fromJson(reader, ApiResponse.class);
+            Cacher.save(response);
+            res = response.getRates().getValue();
         } catch (MalformedURLException e) {
-            System.err.println(e.getMessage());
+            System.err.println(e);
         } catch (IOException e) {
-            System.err.println(e.getMessage());
+            System.err.println(e);
+        } catch (NullPointerException e) {
+            if (from.equals(to)) {
+                res = 1.0;
+            }
+            System.err.println(e);
         } finally {
             try {
                 if (reader != null) {
