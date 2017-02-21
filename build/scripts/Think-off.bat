@@ -63,7 +63,7 @@ set CMD_LINE_ARGS=%*
 :execute
 @rem Setup the command line
 
-set CLASSPATH=%APP_HOME%\lib\CurrentCurrency-1.0.jar;%APP_HOME%\lib\gson-2.8.0.jar
+set CLASSPATH=%APP_HOME%\lib\tinkoff-1.0.jar;%APP_HOME%\lib\gson-2.8.0.jar
 
 @rem Execute Think-off
 "%JAVA_EXE%" %DEFAULT_JVM_OPTS% %JAVA_OPTS% %THINK_OFF_OPTS%  -classpath "%CLASSPATH%" com.geomslayer.Main %CMD_LINE_ARGS%

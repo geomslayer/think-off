@@ -8,7 +8,8 @@ import com.google.gson.GsonBuilder;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.net.SocketTimeoutException;
+import java.io.InterruptedIOException;
+import java.net.SocketException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.UnknownHostException;
@@ -33,8 +34,8 @@ public class Fetcher {
         return gson;
     }
 
-    // fetches data
-    // first it checks data in cache, then tries to load from the network
+    // Fetches data;
+    // First it checks data in cache, then tries to load from the network
     public static ApiResponse fetchCurrency(String from, String to) {
         String message = null;
         if (!validate(from) || !validate(to)) {
@@ -43,7 +44,7 @@ public class Fetcher {
 
         ApiResponse res = Cacher.restore(from, to);
 
-        // not stored in cache or the information is old
+        // Not stored in cache or the information is old
         if (res == null || !TimeUtil.updated(res.getDate())) {
             URLConnection connection = null;
             try {
@@ -58,10 +59,8 @@ public class Fetcher {
             if (connection != null) {
                 try (BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
                     res = getGson().fromJson(reader, ApiResponse.class);
-                } catch (UnknownHostException e) {
-                    message = "No internet connection!";
-                } catch (SocketTimeoutException e) {
-                    message = "Server doesn't response";
+                } catch (SocketException | InterruptedIOException | UnknownHostException e) {
+                    message = "No connection with server!";
                 } catch (IOException e) {
                     message = INVALID_INPUT;
                 } catch (Exception e) {
@@ -89,7 +88,7 @@ public class Fetcher {
         return res;
     }
 
-    // simple validation of currency
+    // Simple validation of currency
     private static boolean validate(String currency) {
         boolean res = currency.length() == 3;
         for (int i = 0; i < currency.length(); ++i) {
@@ -99,7 +98,7 @@ public class Fetcher {
         return res;
     }
 
-    // class for async call
+    // Class for async call
     public static class Loader implements Callable<ApiResponse> {
 
         private String from;

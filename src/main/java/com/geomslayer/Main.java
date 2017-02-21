@@ -43,7 +43,7 @@ public class Main {
 
                 ApiResponse response = null;
 
-                // async call, but in the main thread we don't have another work
+                // Async call, but in the main thread we don't have another work
                 // so just get data right here
                 Callable<ApiResponse> loader = new Fetcher.Loader(from, to);
                 Future<ApiResponse> futureResponse = service.submit(loader);
@@ -71,7 +71,13 @@ public class Main {
                 printer.print("Continue? y/n ");
                 printer.flush();
 
-                String reply = scanner.readLine().trim().toLowerCase();
+                String reply = scanner.readLine();
+                if (reply == null) {
+                    printer.println();
+                    finish();
+                }
+
+                reply = reply.trim().toLowerCase();
                 if (!reply.equals("") && !reply.equals("y")) {
                     finish();
                 }

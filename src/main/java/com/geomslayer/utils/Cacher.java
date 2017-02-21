@@ -10,7 +10,7 @@ public class Cacher {
     private static final File dir;
 
     static {
-        dir = new File("cache");
+        dir = new File(".cache");
     }
 
     private Cacher() {}
@@ -20,21 +20,21 @@ public class Cacher {
         try {
             dir.mkdir();
         } catch (SecurityException e) {
-            // bad, couldn't save cache
-            // but we won't ask user to permit us
+            // Bad -- couldn't save cache;
+            // But we won't ask user to permit us
         }
 
         try {
             entry.createNewFile();
         } catch (IOException | SecurityException e) {
-            // similarly
+            // Similarly
         }
 
         try (PrintWriter writer = new PrintWriter(new FileWriter(entry))) {
             writer.println(data.getDate());
             writer.println(data.getRates().getValue());
         } catch (IOException | SecurityException e) {
-            // similarly
+            // Similarly
         }
 
     }
@@ -49,7 +49,7 @@ public class Cacher {
 
             res = new ApiResponse(from, cachedDate, new Rate(to, Double.valueOf(value)));
         } catch (IOException e) {
-            // it's OK: it means there wasn't such query yet
+            // It's OK: that means there wasn't such query yet
         }
 
         return res;
