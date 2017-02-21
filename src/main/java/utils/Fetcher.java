@@ -18,6 +18,8 @@ public class Fetcher {
 
     private static Gson gson;
 
+    private Fetcher() {}
+
     private static Gson getGson() {
         if (gson == null) {
             gson = new GsonBuilder()
@@ -28,43 +30,39 @@ public class Fetcher {
     }
 
     @Nullable
-    public static Double fetchCurrency(String from, String to) {
-        BufferedReader reader = null;
-        Double res = null;
-
+    public static ApiResponse fetchCurrency(String from, String to) {
         if (!validate(from) || !validate(to)) {
             return null;
         }
 
-        res = Cacher.restore(from, to);
-        if (res != null) {
-            System.out.println("Restored cached value");
-            return res;
+        ApiResponse res = Cacher.restore(from, to);
+
+        if (res == null) {
+            URL url;
+            try {
+                url = new URL(String.format(baseUrl, from, to));
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+                return null;
+            }
+
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream()))) {
+                res = getGson().fromJson(reader, ApiResponse.class);
+            } catch (IOException e) {
+                System.err.println(e);
+            }
         }
 
-        try {
-            URL url = new URL(String.format(baseUrl, from, to));
-            reader = new BufferedReader(new InputStreamReader(url.openStream()));
-            ApiResponse response = getGson().fromJson(reader, ApiResponse.class);
-            Cacher.save(response);
-            res = response.getRates().getValue();
-        } catch (MalformedURLException e) {
-            System.err.println(e);
-        } catch (IOException e) {
-            System.err.println(e);
-        } catch (NullPointerException e) {
-            if (from.equals(to)) {
-                res = 1.0;
-            }
-            System.err.println(e);
-        } finally {
-            try {
-                if (reader != null) {
-                    reader.close();
+        if (res != null) {
+            if (res.getRates() == null) {
+                if (from.equals(to)) {
+                    res.setRates(new Rate(to, 1.0));
+                } else {
+                    return null;
                 }
-            } catch (IOException e) {
-                System.err.println(e.getMessage());
             }
+            Cacher.save(res);
+            res.setDate(TimeUtil.formatDate(res.getDate()));
         }
 
         return res;
@@ -78,4 +76,5 @@ public class Fetcher {
         }
         return res;
     }
+
 }

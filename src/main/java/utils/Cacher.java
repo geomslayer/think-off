@@ -1,21 +1,19 @@
 package utils;
 
 import models.ApiResponse;
+import models.Rate;
 
 import java.io.*;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 public class Cacher {
 
-    private static final DateFormat dateFormat;
     private static final File dir;
 
     static {
-        dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         dir = new File("cache");
     }
+
+    private Cacher() {}
 
     public static void save(ApiResponse data) {
         File entry = new File(dir, formFilename(data.getBase(), data.getRates().getCurrency()));
@@ -35,22 +33,19 @@ public class Cacher {
 
     }
 
-    public static Double restore(String from, String to) {
+    public static ApiResponse restore(String from, String to) {
         File entry = new File(dir, formFilename(from, to));
-        Double res = null;
+        ApiResponse res = null;
 
         try (BufferedReader reader = new BufferedReader(new FileReader(entry))) {
             String cachedDate = reader.readLine();
             String value = reader.readLine();
 
-            Date date = new Date();
-            String curDate = dateFormat.format(date);
-
-            if (curDate.equals(cachedDate)) {
-                res = Double.valueOf(value);
+            if (TimeUtil.updated(cachedDate)) {
+                res = new ApiResponse(from, cachedDate, new Rate(to, Double.valueOf(value)));
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            // it's OK: there wasn't such query
         }
 
         return res;

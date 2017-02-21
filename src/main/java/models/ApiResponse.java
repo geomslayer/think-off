@@ -7,8 +7,18 @@ public class ApiResponse {
     private String date;
     private Rate rates;
 
+    public ApiResponse(String base, String date, Rate rates) {
+        this.base = base;
+        this.date = date;
+        this.rates = rates;
+    }
+
     public String getBase() {
         return base;
+    }
+
+    public void setDate(String date) {
+        this.date = date;
     }
 
     public String getDate() {
@@ -17,6 +27,10 @@ public class ApiResponse {
 
     public Rate getRates() {
         return rates;
+    }
+
+    public void setRates(Rate rates) {
+        this.rates = rates;
     }
 
     @Override

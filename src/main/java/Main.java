@@ -1,3 +1,4 @@
+import models.ApiResponse;
 import utils.Fetcher;
 
 import java.io.BufferedReader;
@@ -28,14 +29,15 @@ public class Main {
                 from = from.toUpperCase().trim();
                 to = to.toUpperCase().trim();
 
-                Double value = Fetcher.fetchCurrency(from, to);
+                ApiResponse response = Fetcher.fetchCurrency(from, to);
 
-                if (value == null) {
+                if (response == null) {
                     printer.println("Sorry :( Your input is invalid\n");
                     continue;
                 }
 
-                printer.println(String.format(Locale.US, "%s -> %s : %.3f\n", from, to, value));
+                printer.println(String.format(Locale.US, "Course for %s is", response.getDate()));
+                printer.println(String.format(Locale.US, "%s 1.000 == %s %.3f\n", from, to, response.getRates().getValue()));
 
             } catch (IOException e) {
                 e.printStackTrace();
