@@ -1,7 +1,7 @@
-package utils;
+package com.geomslayer.utils;
 
-import models.ApiResponse;
-import models.Rate;
+import com.geomslayer.models.ApiResponse;
+import com.geomslayer.models.Rate;
 
 import java.io.*;
 
@@ -17,18 +17,24 @@ public class Cacher {
 
     public static void save(ApiResponse data) {
         File entry = new File(dir, formFilename(data.getBase(), data.getRates().getCurrency()));
-        dir.mkdir();
+        try {
+            dir.mkdir();
+        } catch (SecurityException e) {
+            // bad, couldn't save cache
+            // but we won't ask user to permit us
+        }
+
         try {
             entry.createNewFile();
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (IOException | SecurityException e) {
+            // similarly
         }
 
         try (PrintWriter writer = new PrintWriter(new FileWriter(entry))) {
             writer.println(data.getDate());
             writer.println(data.getRates().getValue());
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (IOException | SecurityException e) {
+            // similarly
         }
 
     }
@@ -41,11 +47,9 @@ public class Cacher {
             String cachedDate = reader.readLine();
             String value = reader.readLine();
 
-            if (TimeUtil.updated(cachedDate)) {
-                res = new ApiResponse(from, cachedDate, new Rate(to, Double.valueOf(value)));
-            }
+            res = new ApiResponse(from, cachedDate, new Rate(to, Double.valueOf(value)));
         } catch (IOException e) {
-            // it's OK: there wasn't such query
+            // it's OK: it means there wasn't such query yet
         }
 
         return res;

@@ -1,4 +1,4 @@
-package models;
+package com.geomslayer.models;
 
 import java.util.Locale;
 
@@ -6,11 +6,16 @@ public class ApiResponse {
     private String base;
     private String date;
     private Rate rates;
+    private String message;
 
     public ApiResponse(String base, String date, Rate rates) {
         this.base = base;
         this.date = date;
         this.rates = rates;
+    }
+
+    public ApiResponse(String message) {
+        this.message = message;
     }
 
     public String getBase() {
@@ -31,6 +36,14 @@ public class ApiResponse {
 
     public void setRates(Rate rates) {
         this.rates = rates;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
     }
 
     @Override

@@ -1,4 +1,4 @@
-package models;
+package com.geomslayer.models;
 
 import java.util.Locale;
 

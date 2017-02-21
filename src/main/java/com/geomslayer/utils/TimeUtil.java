@@ -1,9 +1,11 @@
-package utils;
+package com.geomslayer.utils;
 
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.TimeZone;
 
 public class TimeUtil {
 
@@ -33,9 +35,7 @@ public class TimeUtil {
     public static String formatDate(String date) {
         try {
             return dateFormatWithTime.format(parseDate(date).getTime());
-        } catch (NullPointerException e) {
-            e.printStackTrace();
-        }
+        } catch (NullPointerException e) {}
         return null;
     }
 
@@ -46,9 +46,7 @@ public class TimeUtil {
             cachedCalendar.setTime(currentDate);
             cachedCalendar.set(Calendar.HOUR, UPDATE_HOUR);
             return cachedCalendar;
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
+        } catch (ParseException e) {}
         return null;
     }
 
