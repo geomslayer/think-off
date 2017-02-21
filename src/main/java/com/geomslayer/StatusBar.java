@@ -2,6 +2,7 @@ package com.geomslayer;
 
 import java.io.PrintWriter;
 
+// shows loading process while it is needed, of course async
 public class StatusBar {
     private PrintWriter printer;
     private boolean working;

@@ -14,6 +14,8 @@ import java.util.concurrent.Callable;
 
 public class Fetcher {
 
+    private static final String INVALID_INPUT = "Invalid input! Enter currency like USD or RUB.";
+
     private static final String baseUrl = "http://api.fixer.io/latest?base=%s&symbols=%s";
 
     private static Gson gson;
@@ -29,15 +31,18 @@ public class Fetcher {
         return gson;
     }
 
+    // fetches data
+    // first it checks data in cache, then tries to load from the network
     @Nullable
     public static ApiResponse fetchCurrency(String from, String to) {
         String message = null;
         if (!validate(from) || !validate(to)) {
-            return null;
+            return new ApiResponse(INVALID_INPUT);
         }
 
         ApiResponse res = Cacher.restore(from, to);
 
+        // not stored in cache or the information is old
         if (res == null || !TimeUtil.updated(res.getDate())) {
             URLConnection connection = null;
             try {
@@ -57,7 +62,7 @@ public class Fetcher {
                 } catch (SocketTimeoutException e) {
                     message = "Server doesn't response";
                 } catch (IOException e) {
-                    message = "Invalid input!";
+                    message = INVALID_INPUT;
                 } catch (Exception e) {
                     message = "Unexpected error.";
                 }
@@ -69,7 +74,8 @@ public class Fetcher {
                 if (from.equals(to)) {
                     res.setRates(new Rate(to, 1.0));
                 } else {
-                    return null;
+                    res.setMessage(INVALID_INPUT);
+                    return res;
                 }
             }
             Cacher.save(res);
@@ -82,6 +88,7 @@ public class Fetcher {
         return res;
     }
 
+    // simple validation of currency
     private static boolean validate(String currency) {
         boolean res = currency.length() == 3;
         for (int i = 0; i < currency.length(); ++i) {
@@ -91,6 +98,7 @@ public class Fetcher {
         return res;
     }
 
+    // class for async call
     public static class Loader implements Callable<ApiResponse> {
 
         private String from;
