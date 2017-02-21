@@ -4,12 +4,14 @@ import com.geomslayer.models.ApiResponse;
 import com.geomslayer.models.Rate;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.sun.istack.internal.Nullable;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.net.*;
+import java.net.SocketTimeoutException;
+import java.net.URL;
+import java.net.URLConnection;
+import java.net.UnknownHostException;
 import java.util.concurrent.Callable;
 
 public class Fetcher {
@@ -33,7 +35,6 @@ public class Fetcher {
 
     // fetches data
     // first it checks data in cache, then tries to load from the network
-    @Nullable
     public static ApiResponse fetchCurrency(String from, String to) {
         String message = null;
         if (!validate(from) || !validate(to)) {
