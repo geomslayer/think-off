@@ -66,6 +66,7 @@ public class Main {
                 if (response.getRates() == null || response.getRates() == null) {
                     continue;
                 }
+                // Print date to let user understand when information was updated
                 printer.println(String.format(Locale.US, "Exchange rates for %s is", response.getDate()));
                 printer.println(String.format(Locale.US, "%s 1.000 == %s %.3f\n", from, to, response.getRates().getValue()));
                 printer.print("Continue? y/n ");
